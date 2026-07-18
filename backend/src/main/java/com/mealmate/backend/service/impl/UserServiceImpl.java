@@ -7,22 +7,28 @@ import com.mealmate.backend.entity.User;
 import com.mealmate.backend.repository.RoleRepository;
 import com.mealmate.backend.repository.UserRepository;
 import com.mealmate.backend.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository,
-                           RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
+//    public UserServiceImpl(UserRepository userRepository,
+//                           RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+//        this.userRepository = userRepository;
+//        this.roleRepository = roleRepository;
+//
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
@@ -42,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
         user.setFullName(requestDTO.getFullName());
         user.setEmail(requestDTO.getEmail());
-        user.setPassword(requestDTO.getPassword());   // BCrypt baad me lagayenge
+        user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));  // BCrypt baad me lagayenge
         user.setPhoneNumber(requestDTO.getPhoneNumber());
         user.setDateOfBirth(requestDTO.getDateOfBirth());
         user.setGender(requestDTO.getGender());
