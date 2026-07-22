@@ -4,6 +4,7 @@ import com.mealmate.backend.dto.MealRequestDTO;
 import com.mealmate.backend.dto.MealResponseDTO;
 import com.mealmate.backend.entity.Meal;
 import com.mealmate.backend.entity.User;
+import com.mealmate.backend.exception.ResourceNotFoundException;
 import com.mealmate.backend.repository.MealRepository;
 import com.mealmate.backend.repository.UserRepository;
 import com.mealmate.backend.service.MealService;
@@ -21,7 +22,7 @@ public class MealServiceImpl implements MealService {
     public MealResponseDTO createMeal(MealRequestDTO requestDTO) {
 
         User user = userRepository.findById(requestDTO.getCreatedBy())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Meal meal = new Meal();
 

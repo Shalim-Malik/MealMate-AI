@@ -4,6 +4,7 @@ import com.mealmate.backend.dto.UserRequestDTO;
 import com.mealmate.backend.dto.UserResponseDTO;
 import com.mealmate.backend.entity.Role;
 import com.mealmate.backend.entity.User;
+import com.mealmate.backend.exception.ResourceNotFoundException;
 import com.mealmate.backend.repository.RoleRepository;
 import com.mealmate.backend.repository.UserRepository;
 import com.mealmate.backend.service.UserService;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Role role = roleRepository.findById(requestDTO.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         User user = new User();
 
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO getUserById(Long id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return mapToResponse(user);
     }
@@ -86,7 +87,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO updateUser(Long id, UserRequestDTO requestDTO) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setFullName(requestDTO.getFullName());
         user.setPhoneNumber(requestDTO.getPhoneNumber());
