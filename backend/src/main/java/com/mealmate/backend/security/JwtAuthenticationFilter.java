@@ -11,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
 
@@ -40,7 +43,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = authHeader.substring(7);
 
         // Extract Email
-        String email = jwtService.extractUsername(jwtToken);
+        String email;
+
+        try {
+            email = jwtService.extractUsername(jwtToken);
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            response.getWriter().write("""
+        {
+            "status":401,
+            "error":"Unauthorized",
+            "message":"JWT Token has expired"
+        }
+        """);
+
+            return;
+        } catch (JwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            response.getWriter().write("""
+        {
+            "status":401,
+            "error":"Unauthorized",
+            "message":"Invalid JWT Token"
+        }
+        """);
+
+            return;
+        }
 
         // Authenticate only if user is not already authenticated
         if (email != null &&

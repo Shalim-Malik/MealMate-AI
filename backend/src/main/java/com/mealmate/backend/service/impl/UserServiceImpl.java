@@ -4,6 +4,8 @@ import com.mealmate.backend.dto.UserRequestDTO;
 import com.mealmate.backend.dto.UserResponseDTO;
 import com.mealmate.backend.entity.Role;
 import com.mealmate.backend.entity.User;
+import com.mealmate.backend.exception.DuplicateEmailException;
+import com.mealmate.backend.exception.DuplicatePhoneException;
 import com.mealmate.backend.exception.ResourceNotFoundException;
 import com.mealmate.backend.repository.RoleRepository;
 import com.mealmate.backend.repository.UserRepository;
@@ -35,11 +37,11 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
 
         if (userRepository.existsByEmail(requestDTO.getEmail())) {
-            throw new RuntimeException("Email already exists.");
+            throw new DuplicateEmailException("Email already exists.");
         }
 
         if (userRepository.existsByPhoneNumber(requestDTO.getPhoneNumber())) {
-            throw new RuntimeException("Phone Number already exists.");
+            throw new DuplicatePhoneException("Phone Number already exists.");
         }
 
         Role role = roleRepository.findById(requestDTO.getRoleId())
@@ -108,7 +110,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
 
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         userRepository.deleteById(id);
