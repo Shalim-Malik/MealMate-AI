@@ -3,6 +3,8 @@ package com.mealmate.backend.controller;
 import com.mealmate.backend.dto.UserRequestDTO;
 import com.mealmate.backend.dto.UserResponseDTO;
 import com.mealmate.backend.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +20,9 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponseDTO registerUser(@RequestBody UserRequestDTO requestDTO) {
+    public UserResponseDTO registerUser(
+            @Valid @RequestBody UserRequestDTO requestDTO) {
+
         return userService.registerUser(requestDTO);
     }
 
@@ -33,9 +37,11 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserResponseDTO updateUser(@PathVariable Long id,
-                                      @RequestBody UserRequestDTO requestDTO) {
-        return userService.updateUser(id, requestDTO);
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UserRequestDTO requestDTO) {
+
+        return ResponseEntity.ok(userService.updateUser(id, requestDTO));
     }
 
     @DeleteMapping("/{id}")
