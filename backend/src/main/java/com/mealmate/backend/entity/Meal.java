@@ -39,6 +39,21 @@ public class Meal {
 
     private String difficulty;
 
+
+    @Column(columnDefinition = "TEXT")
+    private String ingredients;
+
+    @Column(columnDefinition = "TEXT")
+    private String recipe;
+
+    private String youtubeLink;
+
+    private Integer preparationTime;   // Minutes
+
+    private String region;             // North India, South India
+
+    private Boolean isActive = true;
+
     private Boolean isVeg;
 
     private String imageUrl;

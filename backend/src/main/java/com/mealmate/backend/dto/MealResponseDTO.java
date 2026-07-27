@@ -22,4 +22,15 @@ public class MealResponseDTO {
     private String createdBy;
     private String cuisine;
     private String difficulty;
+    private String ingredients;
+
+    private String recipe;
+
+    private String youtubeLink;
+
+    private Integer preparationTime;
+
+    private String region;
+
+    private Boolean isActive;
 }

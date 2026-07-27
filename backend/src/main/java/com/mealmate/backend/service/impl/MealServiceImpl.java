@@ -39,7 +39,12 @@ public class MealServiceImpl implements MealService {
         meal.setDifficulty(requestDTO.getDifficulty());
         meal.setIsVeg(requestDTO.getIsVeg());
         meal.setImageUrl(requestDTO.getImageUrl());
-
+        meal.setIngredients(requestDTO.getIngredients());
+        meal.setRecipe(requestDTO.getRecipe());
+        meal.setYoutubeLink(requestDTO.getYoutubeLink());
+        meal.setPreparationTime(requestDTO.getPreparationTime());
+        meal.setRegion(requestDTO.getRegion());
+        meal.setIsActive(requestDTO.getIsActive());
         meal.setCreatedBy(user);
 
         Meal savedMeal = mealRepository.save(meal);
@@ -64,6 +69,12 @@ public class MealServiceImpl implements MealService {
         response.setDifficulty(meal.getDifficulty());
         response.setIsVeg(meal.getIsVeg());
         response.setImageUrl(meal.getImageUrl());
+        response.setIngredients(meal.getIngredients());
+        response.setRecipe(meal.getRecipe());
+        response.setYoutubeLink(meal.getYoutubeLink());
+        response.setPreparationTime(meal.getPreparationTime());
+        response.setRegion(meal.getRegion());
+        response.setIsActive(meal.getIsActive());
 
         if (meal.getCreatedBy() != null) {
             response.setCreatedBy(meal.getCreatedBy().getFullName());
@@ -73,22 +84,68 @@ public class MealServiceImpl implements MealService {
     }
     @Override
     public List<MealResponseDTO> getAllMeals() {
-        return null;
+
+        return mealRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public MealResponseDTO getMealById(Long id) {
-        return null;
+
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Meal not found"));
+
+        return mapToResponse(meal);
     }
 
     @Override
     public MealResponseDTO updateMeal(Long id, MealRequestDTO requestDTO) {
-        return null;
+
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Meal not found"));
+
+        User user = userRepository.findById(requestDTO.getCreatedBy())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        meal.setMealName(requestDTO.getMealName());
+        meal.setDescription(requestDTO.getDescription());
+        meal.setCategory(requestDTO.getCategory());
+        meal.setCalories(requestDTO.getCalories());
+        meal.setProtein(requestDTO.getProtein());
+        meal.setCarbs(requestDTO.getCarbs());
+        meal.setFats(requestDTO.getFats());
+        meal.setMealType(requestDTO.getMealType());
+        meal.setSeason(requestDTO.getSeason());
+        meal.setCuisine(requestDTO.getCuisine());
+        meal.setDifficulty(requestDTO.getDifficulty());
+        meal.setIngredients(requestDTO.getIngredients());
+        meal.setRecipe(requestDTO.getRecipe());
+        meal.setYoutubeLink(requestDTO.getYoutubeLink());
+        meal.setPreparationTime(requestDTO.getPreparationTime());
+        meal.setRegion(requestDTO.getRegion());
+        meal.setIsActive(requestDTO.getIsActive());
+        meal.setIsVeg(requestDTO.getIsVeg());
+        meal.setImageUrl(requestDTO.getImageUrl());
+        meal.setCreatedBy(user);
+
+        Meal updatedMeal = mealRepository.save(meal);
+
+        return mapToResponse(updatedMeal);
     }
 
     @Override
     public void deleteMeal(Long id) {
 
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Meal not found"));
+
+        mealRepository.delete(meal);
     }
 
 }
