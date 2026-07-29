@@ -1,9 +1,6 @@
 package com.mealmate.backend.service.impl;
 
-import com.mealmate.backend.dto.AiMealDTO;
-import com.mealmate.backend.dto.GenerateMealPlanResponseDTO;
-import com.mealmate.backend.dto.MealPlanRequestDTO;
-import com.mealmate.backend.dto.MealPlanResponseDTO;
+import com.mealmate.backend.dto.*;
 import com.mealmate.backend.entity.Meal;
 import com.mealmate.backend.entity.MealPlan;
 import com.mealmate.backend.entity.User;
@@ -20,7 +17,7 @@ import com.mealmate.backend.repository.UserPreferenceRepository;
 import com.mealmate.backend.ai.GeminiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +30,13 @@ public class MealPlanServiceImpl implements MealPlanService {
     private final UserPreferenceRepository userPreferenceRepository;
     private final GeminiService geminiService;
     private Meal saveMeal(AiMealDTO dto, User user) {
+
+        Optional<Meal> existingMeal =
+                mealRepository.findByMealNameIgnoreCase(dto.getMealName());
+
+        if (existingMeal.isPresent()) {
+            return existingMeal.get();
+        }
 
         Meal meal = new Meal();
 
@@ -56,6 +60,18 @@ public class MealPlanServiceImpl implements MealPlanService {
 
         return mealRepository.save(meal);
     }
+    private void addIngredients(Meal meal, Set<String> groceryItems) {
+
+        if (meal == null || meal.getIngredients() == null) {
+            return;
+        }
+
+        String[] ingredients = meal.getIngredients().split(",");
+
+        for (String ingredient : ingredients) {
+            groceryItems.add(ingredient.trim());
+        }
+    }
 
     @Override
     public MealPlanResponseDTO createMealPlan(MealPlanRequestDTO requestDTO) {
@@ -78,7 +94,7 @@ public class MealPlanServiceImpl implements MealPlanService {
         MealPlan mealPlan = new MealPlan();
 
         mealPlan.setUser(user);
-        mealPlan.setMealDate(LocalDate.now());
+
         mealPlan.setMealDate(requestDTO.getMealDate());
         mealPlan.setBreakfast(breakfast);
         mealPlan.setLunch(lunch);
@@ -99,6 +115,16 @@ public class MealPlanServiceImpl implements MealPlanService {
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public List<MealPlanResponseDTO> getWeeklyMealPlans(Long userId) {
+
+        return mealPlanRepository
+                .findByUserIdOrderByMealDateDesc(userId)
+                .stream()
+                .limit(7)
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -144,6 +170,87 @@ public class MealPlanServiceImpl implements MealPlanService {
         MealPlan updatedMealPlan = mealPlanRepository.save(mealPlan);
 
         return mapToResponse(updatedMealPlan);
+    }
+    private double getCalories(Meal meal) {
+        return meal != null ? meal.getCalories() : 0;
+    }
+    private double getProtein(Meal meal) {
+        return meal != null ? meal.getProtein() : 0;
+    }
+    private double getCarbs(Meal meal) {
+        return meal != null ? meal.getCarbs() : 0;
+    }
+    private double getFats(Meal meal) {
+        return meal != null ? meal.getFats() : 0;
+    }
+    @Override
+    public MealPlanResponseDTO getTodayMealPlan(Long userId) {
+
+        MealPlan mealPlan = mealPlanRepository
+                .findByUserIdAndMealDate(userId, LocalDate.now())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("No meal plan found for today"));
+
+        return mapToResponse(mealPlan);
+    }
+    @Override
+    public GroceryListResponseDTO generateGroceryList(Long userId) {
+
+        List<MealPlan> mealPlans =
+                mealPlanRepository.findByUserIdOrderByMealDateDesc(userId);
+
+        Set<String> groceryItems = new HashSet<>();
+
+        for (MealPlan mealPlan : mealPlans) {
+
+            addIngredients(mealPlan.getBreakfast(), groceryItems);
+            addIngredients(mealPlan.getLunch(), groceryItems);
+            addIngredients(mealPlan.getSnack(), groceryItems);
+            addIngredients(mealPlan.getDinner(), groceryItems);
+        }
+
+        return new GroceryListResponseDTO(new ArrayList<>(groceryItems));
+    }
+    @Override
+    public NutritionSummaryResponseDTO getNutritionSummary(Long userId) {
+
+        List<MealPlan> mealPlans =
+                mealPlanRepository.findByUserIdOrderByMealDateDesc(userId);
+
+        double totalCalories = 0;
+        double totalProtein = 0;
+        double totalCarbs = 0;
+        double totalFats = 0;
+
+        for (MealPlan mealPlan : mealPlans) {
+
+            totalCalories += getCalories(mealPlan.getBreakfast());
+            totalCalories += getCalories(mealPlan.getLunch());
+            totalCalories += getCalories(mealPlan.getSnack());
+            totalCalories += getCalories(mealPlan.getDinner());
+
+            totalProtein += getProtein(mealPlan.getBreakfast());
+            totalProtein += getProtein(mealPlan.getLunch());
+            totalProtein += getProtein(mealPlan.getSnack());
+            totalProtein += getProtein(mealPlan.getDinner());
+
+            totalCarbs += getCarbs(mealPlan.getBreakfast());
+            totalCarbs += getCarbs(mealPlan.getLunch());
+            totalCarbs += getCarbs(mealPlan.getSnack());
+            totalCarbs += getCarbs(mealPlan.getDinner());
+
+            totalFats += getFats(mealPlan.getBreakfast());
+            totalFats += getFats(mealPlan.getLunch());
+            totalFats += getFats(mealPlan.getSnack());
+            totalFats += getFats(mealPlan.getDinner());
+        }
+
+        return new NutritionSummaryResponseDTO(
+                totalCalories,
+                totalProtein,
+                totalCarbs,
+                totalFats
+        );
     }
 
 

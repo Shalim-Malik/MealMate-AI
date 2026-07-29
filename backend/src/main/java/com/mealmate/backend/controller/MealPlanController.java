@@ -1,9 +1,6 @@
 package com.mealmate.backend.controller;
 
-import com.mealmate.backend.dto.GenerateMealPlanRequestDTO;
-import com.mealmate.backend.dto.GenerateMealPlanResponseDTO;
-import com.mealmate.backend.dto.MealPlanRequestDTO;
-import com.mealmate.backend.dto.MealPlanResponseDTO;
+import com.mealmate.backend.dto.*;
 import com.mealmate.backend.service.MealPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,6 +33,20 @@ public class MealPlanController {
                 mealPlanService.getAllMealPlans()
         );
     }
+    @GetMapping("/today/{userId}")
+    public ResponseEntity<MealPlanResponseDTO> getTodayMealPlan(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(mealPlanService.getTodayMealPlan(userId));
+    }
+    @GetMapping("/weekly/{userId}")
+    public ResponseEntity<List<MealPlanResponseDTO>> getWeeklyMealPlans(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                mealPlanService.getWeeklyMealPlans(userId)
+        );
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<MealPlanResponseDTO> getMealPlanById(
@@ -63,7 +74,22 @@ public class MealPlanController {
                 mealPlanService.generateMealPlan(requestDTO.getUserId())
         );
     }
+    @GetMapping("/grocery-list/{userId}")
+    public ResponseEntity<GroceryListResponseDTO> generateGroceryList(
+            @PathVariable Long userId) {
 
+        return ResponseEntity.ok(
+                mealPlanService.generateGroceryList(userId)
+        );
+    }
+    @GetMapping("/nutrition-summary/{userId}")
+    public ResponseEntity<NutritionSummaryResponseDTO> getNutritionSummary(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                mealPlanService.getNutritionSummary(userId)
+        );
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMealPlan(
             @PathVariable Long id) {

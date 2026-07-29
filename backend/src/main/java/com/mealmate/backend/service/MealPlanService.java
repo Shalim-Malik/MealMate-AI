@@ -1,8 +1,6 @@
 package com.mealmate.backend.service;
 
-import com.mealmate.backend.dto.GenerateMealPlanResponseDTO;
-import com.mealmate.backend.dto.MealPlanRequestDTO;
-import com.mealmate.backend.dto.MealPlanResponseDTO;
+import com.mealmate.backend.dto.*;
 
 import java.util.List;
 
@@ -16,6 +14,9 @@ public interface MealPlanService {
 
     MealPlanResponseDTO updateMealPlan(Long id, MealPlanRequestDTO requestDTO);
     GenerateMealPlanResponseDTO generateMealPlan(Long userId);
-
+    MealPlanResponseDTO getTodayMealPlan(Long userId);
+    List<MealPlanResponseDTO> getWeeklyMealPlans(Long userId);
+    GroceryListResponseDTO generateGroceryList(Long userId);
+    NutritionSummaryResponseDTO getNutritionSummary(Long userId);
     void deleteMealPlan(Long id);
 }
