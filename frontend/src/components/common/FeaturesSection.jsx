@@ -25,10 +25,11 @@ function FeaturesSection() {
 
     return (
 
-        <section
-            className="py-5"
-            style={{ background: "#F6FFF7" }}
-        >
+       <section
+           id="features"
+           className="py-5"
+           style={{ background: "#F6FFF7" }}
+       >
 
             <div className="container">
 
