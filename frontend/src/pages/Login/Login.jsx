@@ -1,7 +1,46 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { login } from "../../services/authService";
 
 function Login() {
+const navigate = useNavigate();
 
+const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+});
+
+const handleChange = (e) => {
+    setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+    });
+};
+
+const handleSubmit = async (e) => {
+
+
+    e.preventDefault();
+
+    try {
+
+        const response = await login(formData);
+
+       localStorage.setItem("token", response.token);
+
+        alert("Login Successful");
+
+        navigate("/dashboard");
+
+    } catch (error) {
+
+        alert(
+            error.response?.data?.message || "Login Failed"
+        );
+
+    }
+
+};
     return (
 
         <div className="container py-5">
@@ -24,47 +63,51 @@ function Login() {
 
                         </p>
 
-                        <form>
 
-                            <div className="mb-3">
+                               <form onSubmit={handleSubmit}>
 
-                                <label className="form-label">
+                                   <div className="mb-3">
 
-                                    Email
+                                       <label className="form-label">
+                                           Email
+                                       </label>
 
-                                </label>
+                                       <input
+                                           type="email"
+                                           className="form-control"
+                                           name="email"
+                                           value={formData.email}
+                                           onChange={handleChange}
+                                           required
+                                       />
 
-                                <input
-                                    type="email"
-                                    className="form-control"
-                                />
+                                   </div>
 
-                            </div>
+                                   <div className="mb-4">
 
-                            <div className="mb-4">
+                                       <label className="form-label">
+                                           Password
+                                       </label>
 
-                                <label className="form-label">
+                                       <input
+                                           type="password"
+                                           className="form-control"
+                                           name="password"
+                                           value={formData.password}
+                                           onChange={handleChange}
+                                           required
+                                       />
 
-                                    Password
+                                   </div>
 
-                                </label>
+                                   <button
+                                       type="submit"
+                                       className="btn btn-success w-100"
+                                   >
+                                       Login
+                                   </button>
 
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                />
-
-                            </div>
-
-                            <button
-                                className="btn btn-success w-100"
-                            >
-
-                                Login
-
-                            </button>
-
-                        </form>
+                               </form>
 
                         <p className="text-center mt-4">
 
@@ -93,4 +136,4 @@ function Login() {
 
 }
 
-export default Login;
+export default Login
