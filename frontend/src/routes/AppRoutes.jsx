@@ -6,7 +6,7 @@ import Signup from "../pages/Signup/Signup";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
-
+import Preferences from "../pages/Preferences/Preferences";
 function AppRoutes() {
     return (
         <BrowserRouter>
@@ -30,6 +30,16 @@ function AppRoutes() {
                                 <Dashboard />
                             </MainLayout>
 
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/preferences"
+                    element={
+                        <ProtectedRoute>
+                            <MainLayout>
+                                <Preferences />
+                            </MainLayout>
                         </ProtectedRoute>
                     }
                 />

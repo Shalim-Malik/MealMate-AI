@@ -1,7 +1,8 @@
 import LogoutButton from "../../components/LogoutButton";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
-
+const navigate = useNavigate();
     return (
 
         <div className="container py-5">
@@ -61,6 +62,34 @@ function Dashboard() {
                             Your AI meal recommendation will appear here.
 
                         </p>
+
+                    </div>
+
+                </div>
+                <div className="col-md-12">
+
+                    <div className="card shadow-sm p-4 rounded-4">
+
+                        <div className="d-flex justify-content-between align-items-center">
+
+                            <div>
+
+                                <h4>⚙ Complete Your Preferences</h4>
+
+                                <p className="text-muted mb-0">
+                                    Improve AI meal recommendations by completing your profile.
+                                </p>
+
+                            </div>
+
+                            <button
+                                className="btn btn-success"
+                                onClick={() => navigate("/preferences")}
+                            >
+                                Complete Profile
+                            </button>
+
+                        </div>
 
                     </div>
 
